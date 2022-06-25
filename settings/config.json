@@ -1,0 +1,15 @@
+{
+    "layers": [
+        "skin",
+        "mouth",
+        "hat",
+        "eyes"
+    ],
+    "image_description": "SVG Faces",
+    "image_count": 64,
+    "image_details": {
+        "width": 330,
+        "height": 330
+    },
+    "image_location": "ipfs://QmThdTBCR8DsnXMViDGC13EH9NughYzJrk7VjaAsRBmhX8"
+}
