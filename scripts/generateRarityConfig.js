@@ -2,8 +2,8 @@ const config = require("../settings/config.json");
 const path = require("path");
 const fs = require("fs");
 
-const base = process.cwd()
-const layersBasePath = path.join(base, "/layers")
+const base = process.cwd();
+const layersBasePath = path.join(base, "/layers");
 
 const getLayers = async (_layerType = null) => {
     return fs
@@ -13,40 +13,40 @@ const getLayers = async (_layerType = null) => {
             return {
                 name
             }
-        })
+        });
 }
 
 const generateConfig = async () => {
-    const layers = []
+    const layers = [];
 
     for (var i = 0; i < config.layers.length; i++) {
-        const attributes = await getLayers(config.layers[i])
+        const attributes = await getLayers(config.layers[i]);
 
         for (var j = 0; j < attributes.length; j++) {
             attributes.forEach(attribute => {
-                attribute.weight = 10
+                attribute.weight = 10;
             })
         }
 
-        let metadata = {}
+        let metadata = {};
 
-        metadata.name = config.layers[i]
-        metadata.attributes = attributes
+        metadata.name = config.layers[i];
+        metadata.attributes = attributes;
 
-        layers.push(metadata)
+        layers.push(metadata);
     }
 
-    let rarityData = { layers }
+    let rarityData = { layers };
 
-    saveConfig(rarityData)
+    saveConfig(rarityData);
 }
 
 const saveConfig = (_config) => {
-    fs.writeFileSync(`${base}/settings/rarity.json`, JSON.stringify(_config, null, 2))
+    fs.writeFileSync(`${base}/settings/rarity.json`, JSON.stringify(_config, null, 2));
 }
 
 const main = async () => {
-    await generateConfig()
+    await generateConfig();
 }
 
-main()
+main();
