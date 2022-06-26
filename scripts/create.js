@@ -2,7 +2,6 @@ const config = require("../settings/config.json");
 const path = require("path");
 const fs = require("fs");
 const crypto = require('crypto');
-const { parse, stringify } = require('svgson');
 
 // Define Paths
 const base = process.cwd(); //current working directory
