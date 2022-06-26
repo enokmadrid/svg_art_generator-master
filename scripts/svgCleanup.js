@@ -48,6 +48,7 @@ const runOptimization = (svgFilePath, svgCode) => {
 						mergeStyles: false,
 						minifyStyles: false,
 						cleanupIDs: false,
+						collapseGroups: true
 					},
 				},
 			},
