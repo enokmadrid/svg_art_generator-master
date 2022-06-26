@@ -59,7 +59,12 @@ const runOptimization = (svgFilePath, svgCode) => {
         ]
     });
     const optimizedSvgCode = result.data;
+    const newSvgCode = removeExtraIds(optimizedSvgCode);
+    
+    fs.writeFileSync(svgFilePath, newSvgCode); // replaces files
+}
 
+const removeExtraIds = (optimizedSvgCode) => {
     // MAKE OLD SVG D3 ELEMENT
     const options = {container: optimizedSvgCode}
     const oldSvg = new D3Node(options); // initializes D3 with container element
@@ -83,7 +88,7 @@ const runOptimization = (svgFilePath, svgCode) => {
         .attr('id', null);
     
     const newSvgCode = newSvg.svgString();
-    fs.writeFileSync(svgFilePath, newSvgCode); // replaces files
+    return newSvgCode;
 }
 
 const main = async () => {
