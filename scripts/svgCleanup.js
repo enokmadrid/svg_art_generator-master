@@ -1,12 +1,12 @@
-const config = require("../settings/config.json");
+const config = require('../settings/config.json');
 const { optimize } = require('svgo');
-const path = require("path");
-const fs = require("fs");
+const path = require('path');
+const fs = require('fs');
 const D3Node = require('d3-node');
 
 // LAYERS BASE PATH 
 const base = process.cwd();
-const layersBasePath = path.join(base, "/layers");
+const layersBasePath = path.join(base, '/layers');
 
 // GET SVG FILES
 const getSvgLayers = async (_layerType = null) => {
