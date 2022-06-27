@@ -2,10 +2,7 @@ const config = require("../settings/config.json");
 const { optimize } = require('svgo');
 const path = require("path");
 const fs = require("fs");
-
 const D3Node = require('d3-node');
-    // initializes D3 with container element
-
 
 // LAYERS BASE PATH 
 const base = process.cwd();
@@ -19,7 +16,7 @@ const getSvgLayers = async (_layerType = null) => {
 }
 
 // START OPTIMIZATION
-const optimizeSvgLayers = async () => {
+const runSvgCleanup = async () => {
     for (var i = 0; i < config.layers.length; i++) {
         let files = await getSvgLayers(config.layers[i]);
         files = files.filter(e => e !== '.DS_Store'); // remove this mac hidden file, I cannnot find a better way to delete this
@@ -30,14 +27,17 @@ const optimizeSvgLayers = async () => {
             const svgCode = fs.readFileSync(svgFilePath, { encoding: 'utf-8'});
             
             // RUN IT!!
-            runOptimization(svgFilePath, svgCode);
+            const cleanCode = removeExtraIds(svgCode);
+            const optimizedSvgCode = runSVGO(svgFilePath, cleanCode);
+            
+            // SAVE FILE
+            fs.writeFileSync(svgFilePath, optimizedSvgCode); // replaces files
         });
     }
 }
 
-
 // RUNS SVGO
-const runOptimization = (svgFilePath, svgCode) => {
+const runSVGO = (svgFilePath, svgCode) => {
     const result = optimize(svgCode, {
         path: svgFilePath,
         plugins: [
@@ -58,10 +58,7 @@ const runOptimization = (svgFilePath, svgCode) => {
             },
         ]
     });
-    const optimizedSvgCode = result.data;
-    const newSvgCode = removeExtraIds(optimizedSvgCode);
-    
-    fs.writeFileSync(svgFilePath, newSvgCode); // replaces files
+    return result.data;
 }
 
 const removeExtraIds = (optimizedSvgCode) => {
@@ -87,12 +84,12 @@ const removeExtraIds = (optimizedSvgCode) => {
         .select('g')
         .attr('id', null);
     
-    const newSvgCode = newSvg.svgString();
-    return newSvgCode;
+    // RETURN SVG CODE
+    return newSvg.svgString();
 }
 
 const main = async () => {
-    await optimizeSvgLayers();
+    await runSvgCleanup();
 }
 
 main();
