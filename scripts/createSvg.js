@@ -33,7 +33,7 @@ const initialize = () => {
 }
 
 //Define SVG Canvas
-const createSVG = async (inputStrings) => {
+const createSVG = async () => {
     let imageCount = 1;
     let imagesFailed = 0;
     let attributesLoaded = [];
@@ -100,14 +100,7 @@ const createSVG = async (inputStrings) => {
         // MAKE Selector
         let selector = svgWrapper.d3;
         selector.select(svgWrapper.document).select('svg').html(svgLayers);
-
-        let finalSvg = svgWrapper.svgString();
-
-        console.log(`---------\n---------\n---------\nFINAL SVG: ${finalSvg}`);
-        console.log(`---------\n---------\n---------\nFINAL SVG: ${layerPaths}`);
-
-        // SAVE Final SVG code to File System
-        // fs.writeFileSync(layerPaths[i], finalSvg); // replaces files
+        let finalSvg = svgWrapper.svgString(); // save final svg code
 
         const imageHash = crypto.createHash('sha1').update(layerPaths).digest('hex');
         let isCreated;
@@ -145,7 +138,7 @@ const createSVG = async (inputStrings) => {
     }
 }
 
-// Save the image
+// Save the SVG to File System
 const saveImage = (_imageCount, svgCode) => {
     console.log(`Saving SVG to...  ${buildBasePath}/images/${_imageCount}.svg \n`);
     console.log(`SVG: ${svgCode} \n`);
