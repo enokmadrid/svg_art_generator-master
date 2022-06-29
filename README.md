@@ -29,11 +29,21 @@ This will generate a rarity.json file inside of settings, you can then edit the 
 In more detail, if you have 5 attributes each with a weight of 10, the total weight is 50. A random number is generated from 0 to the total weight, in this case 50. Let's say the random number is 28, it will cycle through each attribute subtracting the weight by the random number until the random number reaches less than or equal to 0. Once that happens, that attribute is selected. 
 
 ### 5. Generate Images
-To create PNG images run:
+**To create PNG images run:**
+
 `$ node scripts/createPng.js`
 
-To create SVG images run:
+OR 
+
+**To create SVG images run:**
+1. First, run SVG Cleaner to remove extra grouped layers and removes idname with svg extensions:
+
+`$ node scripts/svgCleanup.js`
+
+2. To create the SVG images run:
+
 `$ node scripts/createSvg.js`
+
 
 ### 6. Upload your image folder to IPFS
 After generating the images, a build folder will appear with all your images. You'll want to take the *image* folder and upload to IPFS.

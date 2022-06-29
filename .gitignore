@@ -10,7 +10,6 @@
 
 # production
 /build
-/layers
 /settings/rarity.json
 
 # misc
