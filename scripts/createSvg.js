@@ -2,6 +2,7 @@ const config = require("../settings/config.json");
 const path = require("path");
 const fs = require("fs");
 const crypto = require('crypto');
+const D3Node = require('d3-node');
 
 // Define Paths
 const base = process.cwd(); //current working directory
@@ -31,25 +32,25 @@ const initialize = () => {
     fs.mkdirSync(path.join(buildBasePath, "/images"));
 }
 
-// Define Canvas
-const { createCanvas } = require('canvas');
-const canvas = createCanvas(config.image_details.width, config.image_details.height);
-const ctx = canvas.getContext("2d");
-
 //Define SVG Canvas
 const createSVG = async (inputStrings) => {
     let imageCount = 1;
     let imagesFailed = 0;
     let attributesLoaded = [];
     let layerNames = [];
-    let layersPath = "";
+    let layerPaths = "";
     let imageHashes = [];
     let svgLayers = [];
 
+    // RUN FOR EACH IMAGE TO CREATE
     while (imageCount <= config.image_count) {
-        if (imagesFailed > 100) { break }
+        if (imagesFailed > 100) { break };
 
-        console.log(`----------------------------- \n`);
+        console.log(`================================ \n================================ \n`);
+
+        // MAKE SVG WRAPPER
+        const svgWrapper = new D3Node();
+        svgWrapper.createSVG(config.image_details.width, config.image_details.height);
 
         // Determine Layer Path
         for (var i = 0; i < config.layers.length; i++) {
@@ -58,6 +59,7 @@ const createSVG = async (inputStrings) => {
             const attributes = await getAttributes(`${layersBasePath}/${config.layers[i]}/`);
             let totalWeight = 0;
 
+            // Set Rarity
             for (var x = 0; x < attributes.length; x++) {
                 totalWeight += rarity.layers[i].attributes[x].weight;
             }
@@ -78,23 +80,29 @@ const createSVG = async (inputStrings) => {
 
             // Determine layer path
             const layerPath = `${layersBasePath}/${config.layers[i]}/${selectedLayer}`;
-            layersPath += layerPath;
-            console.log(`Layers paths: ${layersPath} \n`);
+            layerPaths += layerPath;
 
             // Load layer
             const { path, attribute } = await loadAttribute(layerPath);
             attributesLoaded.push(attribute);
             
             // --------- ACCESS SVG CODE --------- //
-            let _svgLayer = fs.readFileSync(path);
-            svgLayers.push(_svgLayer);
-            // svgLayers now contains all svg layers
+            let selectedLayerName = selectedLayer.replace('.svg', "");
 
-            console.log(`Attribute: ${attribute}, Path: ${path}`);
-            console.log(`-----Attributes Loaded: ${attributesLoaded} \n`);
+            // Add all layer to a svgMain element
+            var _svgLayer = fs.readFileSync(path, {encoding: 'utf8'});
+            _svgLayer.toString();
+            svgLayers.push(_svgLayer);
+
         }
 
-        const imageHash = crypto.createHash('sha1').update(layersPath).digest('hex');
+        
+        // MAKE Selector
+        let d3 = svgWrapper.d3;
+        d3.select(svgWrapper.document).select('svg').html(svgLayers);
+        console.log(`-------------- \n--------------WRAPPER: ${svgWrapper.svgString()}`);
+
+        const imageHash = crypto.createHash('sha1').update(layerPaths).digest('hex');
         let isCreated;
 
         for (var i = 0; i < imageHashes.length; i++) {
@@ -102,7 +110,7 @@ const createSVG = async (inputStrings) => {
                 console.log(`Image already created...\n`);
                 imagesFailed++;
                 attributesLoaded = [];
-                layersPath = [];
+                layerPaths = [];
                 svgLayers = [];
                 isCreated = true;
             }
@@ -110,57 +118,57 @@ const createSVG = async (inputStrings) => {
 
         imageHashes.push(imageHash);
 
-        if (isCreated) { continue }
+        if (isCreated) { continue };
+
+        
 
         // Create SVGMAIN
-
         for (var i = 0; i < attributesLoaded.length; i++) {
 
-            console.log(`Attribute ${i} Loaded: ${attributesLoaded[i]}\n`);
+            // console.log(`Attribute ${i} Loaded: ${attributesLoaded[i]}\n`);
 
             // takes a list of strings of SVGs to merge together into one large element
-            console.log(`-----SVG Layers Loaded: ${svgLayers} \n`);
 
+            // MAKE Selector
+            // const d3 = svgWrapper.d3;
+            
             // Add all layer to a svgMain element
+            // console.log(d3.select(svgWrapper.document).select('svg').append('g'));
+            // console.log(svgWrapper.svgString());
+
             // convert svgMain to svg format
             // save svgMain to ./build/images/
 
-            // for(var i = 0; i < inputStrings.length; i++) {
-            //     let domParser = new DOMParser();
-            //     let svgDOM = domParser.parseFromString(inputStrings[stringI], 'text/xml').getElementsByTagName('svg')[0];
-            //     while(svgDOM.childNodes.length > 0) {
-            //         svgMain.appendChild(svgDOM.childNodes[0]);
-            //     }
-            // }
-            // return svgMain
+            // Save Image & Metadata
+            //let svgFileName = `${config.image_description} #${imageCount}`;
+            //saveImage(svgFileName, svgCode);
         }
 
+        // console.log(`-----SVG Layers Loaded: ${svgLayers} \n`);
+
         // Save Image & Metadata
-        saveImage(imageCount);
+        // let svgFileName = `${config.image_description} #${imageCount}`;
+        // saveImage(svgFileName, svgCode);
         saveMetadata(createMetadata(imageHash, imageCount, defineAttributes(layerNames)), imageCount);
 
         console.log(imageHash);
-        console.log(`Created Image: ${imageCount}\n -----------------------`);
+        //console.log(`Created Image: ${svgFileName}\n -----------------------`);
 
         // Increment, Reset values & canvas
         imageCount++;
         attributesLoaded = [];
         layerNames = [];
-        layersPath = "";
+        layerPaths = "";
         svgLayers = [];
-        ctx.clearRect(0, 0, config.image_details.width, config.image_details.height);
     }
 }
 
 // Save the image
-const saveImage = (_imageCount) => {
-    console.log(`Saving Image...\n`);
-    console.log(`Image: ${_imageCount} \n`);
+const saveImage = (svgFileName, svgCode) => {
+    console.log(`Saving SVG to...  ${buildBasePath}/images/${svgFileName}.svg \n`);
+    console.log(`SVG: ${svgCode} \n`);
 
-    // fs.writeFileSync(
-    //     `${buildBasePath}/images/${_imageCount}.jpeg`,
-    //     canvas.toBuffer("image/jpeg")
-    // )
+    // fs.writeFileSync(`${buildBasePath}/images/${svgFileName}.svg`, svgCode);
 }
 
 // Save the metadata

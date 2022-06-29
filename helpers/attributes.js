@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { loadImage } = require('canvas')
+const { loadImage } = require('canvas');
 
 const getAttributes = async (_path) => {
     return fs
@@ -10,7 +10,7 @@ const getAttributes = async (_path) => {
                 id: index,
                 filename: i
             }
-        })
+        });
 }
 
 // Fetch Layer
@@ -18,10 +18,10 @@ const loadAttribute = async (_path) => {
     return new Promise(async (resolve) => {
         const attribute = await loadImage(_path);
         resolve({ path: _path, attribute: attribute });
-    })
+    });
 }
 
 module.exports = {
     getAttributes,
     loadAttribute
-}
+};
