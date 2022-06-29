@@ -96,6 +96,8 @@ const createSVG = async () => {
             svgLayers.push(finalLayer);
         }
 
+        // ARRAY to STRING
+        svgLayers = svgLayers.join("");
         
         // MAKE Selector
         let selector = svgWrapper.d3;
@@ -120,7 +122,6 @@ const createSVG = async () => {
 
         if (isCreated) { continue };
 
-
         // Save Image & Metadata
         let svgFileName = `${config.image_description} #${imageCount}`;
         saveImage(imageCount, finalSvg);
@@ -142,7 +143,7 @@ const createSVG = async () => {
 const saveImage = (_imageCount, svgCode) => {
     console.log(`Saving SVG to...  ${buildBasePath}/images/${_imageCount}.svg \n`);
     console.log(`SVG: ${svgCode} \n`);
-
+    // WRITE FILE
     fs.writeFileSync(`${buildBasePath}/images/${_imageCount}.svg`, svgCode);
 }
 
